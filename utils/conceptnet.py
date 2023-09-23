@@ -387,4 +387,6 @@ def glove_init(input, output, concept_file):
 
 
 if __name__ == "__main__":
-    glove_init("../data/glove/glove.6B.200d.txt", "../data/glove/glove.200d", '../data/glove/tp_str_corpus.json')
+    #glove_init("../data/glove/glove.6B.200d.txt", "../data/glove/glove.200d", '../data/glove/tp_str_corpus.json')
+    extract_english('../data/cpnet/conceptnet-assertions-5.6.0.csv','../data/cpnet/conceptnet1.en.csv','../data/cpnet/concept1.txt')
+    #construct_graph('../data/cpnet/conceptnet.en.csv','../data/cpnet/concept.txt','../data/cpnet/conceptnet.en.unpruned.graph')

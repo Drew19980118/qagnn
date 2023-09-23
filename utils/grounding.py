@@ -345,7 +345,9 @@ def ground(statement_path, cpnet_vocab_path, pattern_path, output_path, num_proc
 
 
 if __name__ == "__main__":
-    create_matcher_patterns("../data/cpnet/concept.txt", "./matcher_res.txt", True)
+    ground('../data/csqa/statement/train.statement.sample.jsonl', '../data/cpnet/concept.txt', '../data/cpnet/matcher_patterns.json', '../data/csqa/grounded/train.grounded.jsonl')
+    # create_matcher_patterns("../data/cpnet/concept.txt", "../data/cpnet/matcher_patterns.json", True)
+    # create_matcher_patterns("../data/cpnet/concept.txt", "./matcher_res.txt", True)
     # ground("../data/statement/dev.statement.jsonl", "../data/cpnet/concept.txt", "../data/cpnet/matcher_patterns.json", "./ground_res.jsonl", 10, True)
 
     # s = "a revolving door is convenient for two direction travel, but it also serves as a security measure at a bank."

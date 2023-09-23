@@ -150,6 +150,7 @@ class QAGNN(nn.Module):
 
         returns: (batch_size, 1)
         """
+        print(concept_ids[0])
         gnn_input0 = self.activation(self.svec2nvec(sent_vecs)).unsqueeze(1) #(batch_size, 1, dim_node)
         gnn_input1 = self.concept_emb(concept_ids[:, 1:]-1, emb_data) #(batch_size, n_node-1, dim_node)
         gnn_input1 = gnn_input1.to(node_type_ids.device)
@@ -157,7 +158,8 @@ class QAGNN(nn.Module):
 
 
         #Normalize node sore (use norm from Z)
-        _mask = (torch.arange(node_scores.size(1), device=node_scores.device) < adj_lengths.unsqueeze(1)).float() #0 means masked out #[batch_size, n_node]
+        tar = torch.arange(node_scores.size(1), device=node_scores.device)
+        _mask = (tar < adj_lengths.unsqueeze(1)).float() #0 means masked out #[batch_size, n_node]
         node_scores = -node_scores
         node_scores = node_scores - node_scores[:, 0:1, :] #[batch_size, n_node, 1]
         node_scores = node_scores.squeeze(2) #[batch_size, n_node]
@@ -467,7 +469,8 @@ class GATConvE(MessagePassing):
 
 
         query = query / math.sqrt(self.dim_per_head)
-        scores = (query * key).sum(dim=2) #[E, heads]
+        scores = (query * key)
+        scores = scores.sum(dim=2) #[E, heads]
         src_node_index = edge_index[0] #[E,]
         alpha = softmax(scores, src_node_index) #[E, heads] #group by src side node
         self._alpha = alpha

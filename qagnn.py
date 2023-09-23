@@ -246,6 +246,7 @@ def train(args):
             if epoch_id == args.refreeze_epoch:
                 freeze_net(model.encoder)
             model.train()
+            print('train size:', dataset.train_size())
             for qids, labels, *input_data in dataset.train():
                 optimizer.zero_grad()
                 bs = labels.size(0)
@@ -260,6 +261,8 @@ def train(args):
                         loss = compute_loss(logits, labels[a:b])
                     loss = loss * (b - a) / bs
                     if args.fp16:
+                        print('a:', a)
+                        print('loss是', loss)
                         scaler.scale(loss).backward()
                     else:
                         loss.backward()
@@ -277,6 +280,8 @@ def train(args):
                 else:
                     optimizer.step()
 
+                print('log interval:', args.log_interval)
+                print('global step:', global_step)
                 if (global_step + 1) % args.log_interval == 0:
                     total_loss /= args.log_interval
                     ms_per_batch = 1000 * (time.time() - start_time) / args.log_interval

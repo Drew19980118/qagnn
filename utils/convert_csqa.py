@@ -186,7 +186,8 @@ def create_output_dict(input_json: dict, statement: str, label: bool, ans_pos: b
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        raise ValueError("Provide at least two arguments: "
-                         "json file with hits, output file name")
-    convert_to_entailment(sys.argv[1], sys.argv[2])
+    # if len(sys.argv) < 3:
+    #     raise ValueError("Provide at least two arguments: "
+    #                      "json file with hits, output file name")
+    # convert_to_entailment(sys.argv[1], sys.argv[2])
+    convert_to_entailment('../data/csqa/train_rand_split.jsonl','../data/csqa/statement/train.statement1.jsonl')

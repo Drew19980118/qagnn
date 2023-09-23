@@ -129,11 +129,17 @@ def load_sparse_adj_data_with_contextnode(adj_pk_path, max_node_num, num_choice,
                     _cid = int(concept_ids[idx, _j_]) - 1
                     assert _cid in cid2score
                     node_scores[idx, _j_, 0] = torch.tensor(cid2score[_cid])
+            # #print(cid2score[0])
+            # new_cid2score = [ele for ele, _ in cid2score.items()]
+            # list_concept_id = [item.item() for item in  concept_ids[0] if item != 1]
+            # print(concept_ids[0])
+            # print(node_scores[0].view(-1))
 
             #Prepare node types
             node_type_ids[idx, 0] = 3 #contextnode
             node_type_ids[idx, 1:num_concept][torch.tensor(qm, dtype=torch.bool)[:num_concept-1]] = 0
             node_type_ids[idx, 1:num_concept][torch.tensor(am, dtype=torch.bool)[:num_concept-1]] = 1
+            print(node_type_ids[0])
 
             #Load adj
             ij = torch.tensor(adj.row, dtype=torch.int64) #(num_matrix_entries, ), where each entry is coordinate

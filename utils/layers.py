@@ -602,7 +602,15 @@ class CustomizedEmbedding(nn.Module):
             return contextualized_emb.gather(1, index.unsqueeze(-1).expand(-1, -1, emb_dim))
         else:
             if hasattr(self, 'cpt_transform'):
-                return self.activation(self.cpt_transform(self.emb(index) * self.scale))
+                #torch.manual_seed(0)
+                emb = self.emb(index)
+                print(emb[0][-1])
+                print(emb[0][-2])
+                print(emb[0][-3])
+                emb = emb * self.scale
+                emb = self.cpt_transform(emb)
+                return self.activation(emb)
+                #return self.activation(self.cpt_transform(self.emb(index) * self.scale))
             else:
                 return self.emb(index) * self.scale
 

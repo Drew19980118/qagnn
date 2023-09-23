@@ -3,7 +3,7 @@ import networkx as nx
 import itertools
 import json
 from tqdm import tqdm
-from .conceptnet import merged_relations
+from conceptnet import merged_relations
 import numpy as np
 from scipy import sparse
 import pickle
@@ -12,7 +12,7 @@ from multiprocessing import Pool
 from collections import OrderedDict
 
 
-from .maths import *
+from maths import *
 
 __all__ = ['generate_graph']
 
@@ -246,37 +246,35 @@ def concepts_to_adj_matrices_3hop_qa_pair(data):
     adj, concepts = concepts2adj(schema_graph)
     return adj, concepts, qmask, amask
 
-
-
-######################################################################
-from transformers import RobertaTokenizer, RobertaForMaskedLM
-
-class RobertaForMaskedLMwithLoss(RobertaForMaskedLM):
-    #
-    def __init__(self, config):
-        super().__init__(config)
-    #
-    def forward(self, input_ids=None, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None, masked_lm_labels=None):
-        #
-        assert attention_mask is not None
-        outputs = self.roberta(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, position_ids=position_ids, head_mask=head_mask)
-        sequence_output = outputs[0] #hidden_states of final layer (batch_size, sequence_length, hidden_size)
-        prediction_scores = self.lm_head(sequence_output)
-        outputs = (prediction_scores, sequence_output) + outputs[2:]
-        if masked_lm_labels is not None:
-            loss_fct = torch.nn.CrossEntropyLoss(reduction='none')
-            bsize, seqlen = input_ids.size()
-            masked_lm_loss = loss_fct(prediction_scores.view(-1, self.config.vocab_size), masked_lm_labels.view(-1)).view(bsize, seqlen)
-            masked_lm_loss = (masked_lm_loss * attention_mask).sum(dim=1)
-            outputs = (masked_lm_loss,) + outputs
-            # (masked_lm_loss), prediction_scores, sequence_output, (hidden_states), (attentions)
-        return outputs
-
-print ('loading pre-trained LM...')
-TOKENIZER = RobertaTokenizer.from_pretrained('roberta-large')
-LM_MODEL = RobertaForMaskedLMwithLoss.from_pretrained('roberta-large')
-LM_MODEL.cuda(); LM_MODEL.eval()
-print ('loading done')
+# ######################################################################
+# from transformers import RobertaTokenizer, RobertaForMaskedLM
+#
+# class RobertaForMaskedLMwithLoss(RobertaForMaskedLM):
+#     #
+#     def __init__(self, config):
+#         super().__init__(config)
+#     #
+#     def forward(self, input_ids=None, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None, masked_lm_labels=None):
+#         #
+#         assert attention_mask is not None
+#         outputs = self.roberta(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, position_ids=position_ids, head_mask=head_mask)
+#         sequence_output = outputs[0] #hidden_states of final layer (batch_size, sequence_length, hidden_size)
+#         prediction_scores = self.lm_head(sequence_output)
+#         outputs = (prediction_scores, sequence_output) + outputs[2:]
+#         if masked_lm_labels is not None:
+#             loss_fct = torch.nn.CrossEntropyLoss(reduction='none')
+#             bsize, seqlen = input_ids.size()
+#             masked_lm_loss = loss_fct(prediction_scores.view(-1, self.config.vocab_size), masked_lm_labels.view(-1)).view(bsize, seqlen)
+#             masked_lm_loss = (masked_lm_loss * attention_mask).sum(dim=1)
+#             outputs = (masked_lm_loss,) + outputs
+#             # (masked_lm_loss), prediction_scores, sequence_output, (hidden_states), (attentions)
+#         return outputs
+#
+# print ('loading pre-trained LM...')
+# TOKENIZER = RobertaTokenizer.from_pretrained('roberta-large')
+# LM_MODEL = RobertaForMaskedLMwithLoss.from_pretrained('roberta-large')
+# LM_MODEL.cuda(); LM_MODEL.eval()
+# print ('loading done')
 
 def get_LM_score(cids, question):
     cids = cids[:]
@@ -577,8 +575,8 @@ def coo_to_normalized(adj_path, output_path, max_node_num, num_processes):
     print(f'normalized adj saved to {output_path}')
     print()
 
-# if __name__ == '__main__':
-#     generate_adj_matrices_from_grounded_concepts('./data/csqa/grounded/train.grounded.jsonl',
-#                                                  './data/cpnet/conceptnet.en.pruned.graph',
-#                                                  './data/cpnet/concept.txt',
-#                                                  '/tmp/asdf', 40)
+if __name__ == '__main__':
+    generate_adj_data_from_grounded_concepts__use_LM('../data/csqa/grounded/train.grounded.jsonl',
+                                                 '../data/cpnet/conceptnet.en.pruned.graph',
+                                                 '../data/cpnet/concept.txt',
+                                                 '../data/csqa/graph/train.graph.adj.pk', 1)
